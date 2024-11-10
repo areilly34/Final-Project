@@ -11,11 +11,14 @@ def fetch_event_data():
 
     parse_html = BeautifulSoup(response.content,"html.parser") # parse HTML content 
 
-    events = parse_html.find_all('div',class_=re.compile('[a-z])')) # using regex to scape the ticket information 
-
     data = []
+    for ticket in parse_html: 
 
-    #not used yet but will be the end goal to store all the scaped information. 
+        data = {"event_id": ticket.find('div',class_= "event_id").content.strip(),
+        "event": ticket.find('h1',class_= "event-title").content.strip(),
+        "location": ticket.find('div',class_= "event-venue").content.strip(),
+        "ticket availability": ticket.find('button',class_= "buy-tickets").content.strip()}
+    
     with open('Ticket_data.csv','w', newline = '') as csv_conn:  
         write = csv.DictWriter(csv_conn,fieldnames= data[0].key())
         write.writeheader()
