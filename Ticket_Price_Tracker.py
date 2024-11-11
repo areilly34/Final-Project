@@ -14,7 +14,7 @@ def fetch_event_data():
     data = []
     for ticket in parse_html: 
 
-        data = {"event_id": ticket.find('div',class_= "event_id").content.strip(),
+        data = {"event_id": ticket.find('div',class_= "event-id").content.strip(),
         "event": ticket.find('h1',class_= "event-title").content.strip(),
         "location": ticket.find('div',class_= "event-venue").content.strip(),
         "ticket availability": ticket.find('button',class_= "buy-tickets").content.strip()}
@@ -25,7 +25,7 @@ def fetch_event_data():
         write.writerows(data)
     
 
-    pass 
+
 
 
 
