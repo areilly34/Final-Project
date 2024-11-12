@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup 
 import re
 import csv 
-
+import smtplib
 
 def fetch_event_data():
 
@@ -27,9 +27,34 @@ def fetch_event_data():
 
     pass 
 
+def send_price_alert(ticket, user_email):
+    """
+    Sends email to user with ticekt information
+    Agrs:
+        ticket: Dictionary with ticket info
+        user_email: Email of the user
+    Returns:
+    
+    """
+    # Format body so the information is more usable for user
+    subject = 'Ticket Information'
+    body = ticket
+    msg = f"Subject: {subject}\n\n{body}"
 
+    # Login credentials
+    user = 'finalproject326@gmail.com'
+    password = 'jrmuzbocwbhwiipm'
+    send_to = user_email
 
-
+    # Creates smtp object and sends email to user
+    with smtplib.SMTP('smtp.gmail.com', 587) as smtpObj:
+        smtpObj.ehlo()
+        smtpObj.starttls()
+        smtpObj.ehlo()
+    
+        smtpObj.login(user, password)
+        smtpObj.sendmail(user, send_to, msg)
+        print("Email sent.")
 
 if __name__ == "__main__":
     pass  
