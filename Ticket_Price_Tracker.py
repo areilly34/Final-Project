@@ -26,7 +26,26 @@ def fetch_event_data():
         write.writeheader()
         write.writerows(data)
     
+def display_event_details(event):
+    """Displays information for the specific event chosen
+    Parameters: event (dict): A dictionary containiing information of the event such as name, date, venue, website
+    Returns: None
+    """
+    try:
+        print("Event Details")
+        print(f"Name: {event.get('name', 'N/A')}")
+        print(f"Date: {event.get('date', 'N/A')}")
+        print(f"Venue: {event.get('venue', 'N/A')}")
+        print(f"Source: {event.get('source', 'N/A')}")
+        print("Available Tickets:")
 
+        if "tickets" in event and event["tickets]:
+            for ticket in event["tickets"]:
+                print(f" - Section: {ticket.get('section', 'Unknown')}, Seat: {ticket.get('seat', 'Unknown')}, "
+                      f"Price: ${ticket.get('price', 'Unknown')}")
+        else:
+            print("No ticket information available")
+        
 
 
 def generate_ticket_comparison_report(tickets):
