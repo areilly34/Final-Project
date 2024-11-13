@@ -45,8 +45,32 @@ def display_event_details(event):
                       f"Price: ${ticket.get('price', 'Unknown')}")
         else:
             print("No ticket information available")
-        
+            
+def get_user_selection(events):
+    """
+    Allows users to choose an event from a list and returns the details of chosen event
 
+    Parameters: 
+    events (list): A list of dictionaries, where each dictionary contains event details
+
+    Returns: The select event dictionary
+    """
+    if not events:
+        print("No events available to select")
+        return None
+    for index, event in enumerate(events, start=1):
+        print(f"{index}. {event.get('name', 'Unknown Event')} on {event.get('date', 'Unknown Date')} at {event.get('venue', 'Unknown Venue')}")
+
+    while True:
+        try:
+            selection = int(input("Please select an event by number: "))
+            if 1 <= selection <= len(events):
+                return events[selection - 1]
+            else:
+                print(f"Invalid selection. Please enter a number between 1 and {len(events)}.")
+        except ValueError:
+            print("Invalid input. Please enter a valid number.")
+            
 
 def generate_ticket_comparison_report(tickets):
     """
