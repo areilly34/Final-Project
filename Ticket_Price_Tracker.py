@@ -27,20 +27,34 @@ def fetch_event_data():
 
     ticket_content = parse_html.find_all('div', class_='sc-1ugjpjp-0 eNgBRm') # getting pased html content of the web stubhub. 
     print (ticket_content) # test to see what the content is 
-
-    data = [] # storing the ticket data in this open empty list
-    for tickets in ticket_content: # looping through the conent to extract information 
-        event_name = tickets.find_all('div', class_='sc-1mafo1b-4 dvCFno') # gets the ticket event name 
-        event_date = tickets.find_all('time') # not yet working 
-        
+    data =[]
+    event_id = 0
+    for tickets in ticket_content:
+        event_name = tickets.find_all('div', class_='sc-1mafo1b-4 dvCFno') # ticket name 
+        event_date = tickets.find_all('div', class_='sc-ja5jff-4') # ticket month 
+        event_day = tickets.find_all('div', class_='sc-ja5jff-9 ksyIHN' ) # ticket day 
+        event_time = tickets.find_all('div', class_='sc-ja5jff-9 ksyIHN' ) # ticket game time 
+        even_location = tickets.find_all('div', class_='sc-1pilhev-2 dBFhOm') # ticket game location 
+        #event_capacity = tickets.find_all('strong', class_='sc-1poos93-10 dytPDB') areana capacity 
+        ticket_link = tickets.find_all('button', class_='sc-6f7nfk-0 bRXaek sc-lub4vc-7 heBKB') # button link to the ticket to purchase and see price 
+        event_id += 1 # event id to keep track of tickets 
 
         data.append({
+            "event_id": event_id,
             "event": event_name,
             "event date": event_date,
-            }) # this is creating a dictionary of the events 
-    ticket_data_frame = pd.DataFrame(data) # storing the data into a data frame using panda 
+            "event day": event_day,
+            "event time": event_time,
+            "event location": even_location,
+            "ticket ": ticket_link}) # dictonary all the ticket data
+
     
-    return  ticket_data_frame # returns the data frame of tickets 
+    
+    ticket_data_frame = pd.DataFrame(data) # creates a data frame using panda 
+    ticket_data_frame.to_csv('data.csv', index=False) # transfers the data frame into a csv file 
+    return  ticket_data_frame # returns the data frame 
+
+
 def fetch_ticket_prices(event_id): 
     """ using the event id to get ticket prices of the event based on row and section. Then return a list of that information"""
     pass
@@ -58,7 +72,7 @@ def display_event_details(event):
         print(f"Source: {event.get('source', 'N/A')}")
         print("Available Tickets:")
 
-        if "tickets" in event and event["tickets]:
+        if "tickets" in event and event["tickets"]:
             for ticket in event["tickets"]:
                 print(f" - Section: {ticket.get('section', 'Unknown')}, Seat: {ticket.get('seat', 'Unknown')}, "
                       f"Price: ${ticket.get('price', 'Unknown')}")
