@@ -1,30 +1,49 @@
-import requests 
+
 from bs4 import BeautifulSoup 
 import re
 import csv 
 import smtplib
 import tabulate
 import pandas as pd
+import time 
+from selenium import webdriver
 
 def fetch_event_data():
+    """ web scraps through the url to get event name, date, and location then store that to a data frame"""
+    # Set up Chrome WebDriver
+    driver = webdriver.Chrome()
 
-    url = "https://www.ticketmaster.com/" 
-    response = requests.get(url) # sending a request to the website 
+    # Navigate to Hacker News
+    driver.get("https://www.stubhub.com/nba-tickets")
 
-    parse_html = BeautifulSoup(response.content,"html.parser") # parse HTML content 
+    time.sleep(1)
+    # Retrieve the page source
+    page = driver.page_source
 
-    data = []
-    for ticket in parse_html: 
+    # Close the driver
+    driver.quit()
 
-        data = {"event_id": ticket.find('div',class_= "event-id").content.strip(),
-        "event": ticket.find('h1',class_= "event-title").content.strip(),
-        "location": ticket.find('div',class_= "event-venue").content.strip(),
-        "ticket availability": ticket.find('button',class_= "buy-tickets").content.strip()}
+    parse_html = BeautifulSoup(page,"html.parser") # parse HTML content 
+
+    ticket_content = parse_html.find_all('div', class_='sc-1ugjpjp-0 eNgBRm') # getting pased html content of the web stubhub. 
+    print (ticket_content) # test to see what the content is 
+
+    data = [] # storing the ticket data in this open empty list
+    for tickets in ticket_content: # looping through the conent to extract information 
+        event_name = tickets.find_all('div', class_='sc-1mafo1b-4 dvCFno') # gets the ticket event name 
+        event_date = tickets.find_all('time') # not yet working 
+        
+
+        data.append({
+            "event": event_name,
+            "event date": event_date,
+            }) # this is creating a dictionary of the events 
+    ticket_data_frame = pd.DataFrame(data) # storing the data into a data frame using panda 
     
-    with open('Ticket_data.csv','w', newline = '') as csv_conn:  
-        write = csv.DictWriter(csv_conn,fieldnames= data[0].key())
-        write.writeheader()
-        write.writerows(data)
+    return  ticket_data_frame # returns the data frame of tickets 
+def fetch_ticket_prices(event_id): 
+    """ using the event id to get ticket prices of the event based on row and section. Then return a list of that information"""
+    pass
     
 def display_event_details(event):
     """Displays information for the specific event chosen
