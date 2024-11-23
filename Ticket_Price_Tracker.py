@@ -9,11 +9,11 @@ import time
 from selenium import webdriver
 
 def fetch_event_data():
-    """ web scraps through the url to get event name, date, and location then store that to a data frame"""
-    # Set up Chrome WebDriver
+    """ web scraps through the url to get event name, date, and location then store that to a csv file """
+   # Set up Chrome WebDriver
     driver = webdriver.Chrome()
 
-    # Navigate to Hacker News
+    # Navigate to stubhub website 
     driver.get("https://www.stubhub.com/nba-tickets")
 
     time.sleep(1)
@@ -25,35 +25,45 @@ def fetch_event_data():
 
     parse_html = BeautifulSoup(page,"html.parser") # parse HTML content 
 
-    ticket_content = parse_html.find_all('div', class_='sc-1ugjpjp-0 eNgBRm') # getting pased html content of the web stubhub. 
-    print (ticket_content) # test to see what the content is 
-    data =[]
+    data_link = []
+    data ={"event_id":[],
+            "event name": [],
+            "event date": [],
+            "event location": [],
+            "ticket ":[]
+           } # data dict to keep track of all the information 
     event_id = 0
-    for tickets in ticket_content:
-        event_name = tickets.find_all('div', class_='sc-1mafo1b-4 dvCFno') # ticket name 
-        event_date = tickets.find_all('div', class_='sc-ja5jff-4') # ticket month 
-        event_day = tickets.find_all('div', class_='sc-ja5jff-9 ksyIHN' ) # ticket day 
-        event_time = tickets.find_all('div', class_='sc-ja5jff-9 ksyIHN' ) # ticket game time 
-        even_location = tickets.find_all('div', class_='sc-1pilhev-2 dBFhOm') # ticket game location 
-        #event_capacity = tickets.find_all('strong', class_='sc-1poos93-10 dytPDB') areana capacity 
-        ticket_link = tickets.find_all('button', class_='sc-6f7nfk-0 bRXaek sc-lub4vc-7 heBKB') # button link to the ticket to purchase and see price 
-        event_id += 1 # event id to keep track of tickets 
-
-        data.append({
-            "event_id": event_id,
-            "event": event_name,
-            "event date": event_date,
-            "event day": event_day,
-            "event time": event_time,
-            "event location": even_location,
-            "ticket ": ticket_link}) # dictonary all the ticket data
+    event_name = parse_html.find_all('div', class_='sc-1mafo1b-4 dvCFno') # finds all the evnet names on the url 
+    for i_name in event_name: # looping through each event name
+        event_id+=1 # creating id for each event 
+        data["event name"].append(i_name.get_text()) # adding all the evnet names to the event name key 
+        data['event_id'].append(event_id) # creating event id and adding it to event id key 
 
     
+    event_date = parse_html.find_all('div', class_='sc-ja5jff-4') # finds all event dates  on the url 
+    data["event date"].extend([i_date.get_text()for i_date in event_date]) # using list comprehension to add each event date to event date key 
+    event_location = parse_html.find_all('div', class_='sc-1pilhev-2 dBFhOm') # finds all event location on the url 
+    data["event location"].extend([i_location.get_text()for i_location in event_location]) #using list comprehension to add each event location to event location key
+    ticket_link = parse_html.find_all('a', class_='sc-1x2zy2i-2 cYRIRc') # finds all links on the url  
+    for i_link in ticket_link:
+        link = i_link.get("href") # getting each link from the find all link 
+        if 'event' in link: # checks to make sure each link is a event
+            data_link.append(link) # adds it to link data 
     
-    ticket_data_frame = pd.DataFrame(data) # creates a data frame using panda 
-    ticket_data_frame.to_csv('data.csv', index=False) # transfers the data frame into a csv file 
-    return  ticket_data_frame # returns the data frame 
+    data['ticket '].extend(data_link) # adding it to ticket key in the data dict 
 
+
+    # open file in write mode
+
+    with open("data.csv", "w", newline="") as csvfile: # creating the connection
+
+        writer = csv.DictWriter(csvfile, fieldnames=data.keys())  # create writer with header based on keys
+
+        writer.writeheader()  # write header row
+
+        for row in zip(data["event_id"], data["event name"], data["event location"],data["event date"],data["ticket "]):  # iterate through values in each column
+
+            writer.writerow(dict(zip(data.keys(), row)))  # write each row as a dictionary
 
 def fetch_ticket_prices(event_id): 
     """ using the event id to get ticket prices of the event based on row and section. Then return a list of that information"""
