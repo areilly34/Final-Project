@@ -65,9 +65,69 @@ def fetch_event_data():
 
             writer.writerow(dict(zip(data.keys(), row)))  # write each row as a dictionary
 
-def fetch_ticket_prices(event_id): 
-    """ using the event id to get ticket prices of the event based on row and section. Then return a list of that information"""
-    pass
+def fetch_ticket_price():
+    """ This methond will read in a csv file of ticket data that includes link to prices. 
+        Then using that link extract the section,row, and ticket price for that url.
+        The ticket id matchs the event id 
+        """
+    driver = webdriver.Chrome()
+    
+    url = [] # empty url list to store all the links thats being read 
+
+    with open('data.csv') as file_conn:  # creating a connection to the data of tickets to get the link 
+        heading = next(file_conn) # skipping the headers of the csv file 
+        reader_obj = csv.reader(file_conn) # reading through the document and storing it as objects 
+        for row in reader_obj: #reading through each object row by row 
+            url.append(row[4]) # storing each link to the url list 
+            
+    
+    ticket_data = {"ticket_id":[],
+            "ticket_section": [],
+            "ticket_row": [],
+            "ticket_price": [],
+            } # ticket data dict that stores all the ticket information
+    ticket_id = 0 # id counter for the tickets 
+    section_row = [] # data of section and rows joint data from the pages 
+    t_section = [] # ticket section
+    t_row = [] # ticket row 
+    for link in url:
+        
+        driver.get(link+'?quantity=1') # searches for the link but the +'?quantity=1' is saying we looking for 1 ticket each time. normally when  you open it you need to pick how many tickets you want. this just by pass it 
+        time.sleep(1) # this will help us not get block on the website since we are looking thorugh a lot of links. its also the internet rule 
+        page = driver.page_source
+        ticket_id +=1 # icrements through the links. so each time a new ticket is taking a look at it will have the same id as the data.csv 
+        parse_html = BeautifulSoup(page,"html.parser") # parse HTML content 
+
+        ticket_section_row = parse_html.find_all('div', class_='sc-hlalgf-0 sc-hlalgf-6 jfjuff jXdyTR')
+        for i_section in ticket_section_row: # loops through the parsed list of section and row list 
+            ticket_data["ticket_id"].append(ticket_id) # creates the same id for the same ticket that is being looked at 
+            section_row.append(i_section.get_text('span')) # addds the section and rows to the section rows list that is connected by span in the html
+            
+        ticket_price = parse_html.find_all('div', class_="sc-hlalgf-0 sc-hlalgf-1 jfjuff tOKfM") # gets all the html prices on the page 
+        for i_price in ticket_price: # loops through  the parsed html list of all prices on the page
+            ticket_data["ticket_id"].append(ticket_id) # creates a id for the ticket but the code breaks when this line gets taken out but does not effect the data all. 
+            ticket_data["ticket_price"].append(i_price.get_text()) # gets each price from the ticket_price parse html then add it to ticket data['ticket price]
+    
+    for section in section_row: # loops through the section and rows string to get each elemement at a time 
+        split =section.split('span') # splits the sections and rows string at 'span' ex:Section 104spanRow J turns to Section[0] Row J[1]
+        t_section.append(split[0].strip()) # gets the sections then add it to section list 
+        t_row.append(split[1].strip() if len(split) > 1 else 'N/A') # gets the rows then adds it to rows list. also adds 'N/A' if there is no rows in that section
+    ticket_data["ticket_section"].extend(t_section) # adds the list of sections to the ticket section key in the ticket data 
+    ticket_data["ticket_row"].extend(t_row) # adds the list of rows to the ticket row key in the ticket data 
+    
+
+    driver.quit() # stops the driver 
+    
+    with open("Ticket_info.csv", "w", newline="") as csvfile: # creating a connection to the file 
+
+        writer = csv.DictWriter(csvfile, fieldnames=ticket_data.keys())  # create writer with header based on keys
+
+        writer.writeheader()  # write header row
+
+        for row in zip(ticket_data["ticket_id"], ticket_data["ticket_section"], ticket_data["ticket_row"],ticket_data["ticket_price"]):  # iterate through values in each column
+
+            writer.writerow(dict(zip(ticket_data.keys(), row)))  # write each row as a dictionary
+
     
 def display_event_details(event):
     """Displays information for the specific event chosen
