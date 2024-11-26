@@ -154,6 +154,8 @@ def display_event_details(event):
                       f"Price: ${ticket.get('price', 'Unknown')}")
         else:
             print("No ticket information available")
+    except:
+        pass
             
 def get_user_selection(events):
     """
@@ -223,7 +225,7 @@ def send_price_alert(ticket, user_email):
     
     # Format body so the information is more usable for user
     subject = 'Ticket Information'
-    body = ticket
+    body = (f"Name: {ticket['Name']}\nDate: {ticket['Date']}\nVenue: {ticket['Venue']}\n{ticket['Source']}")
     msg = f"Subject: {subject}\n\n{body}"
 
     # Login credentials
@@ -242,4 +244,4 @@ def send_price_alert(ticket, user_email):
         print("Email sent.")
 
 if __name__ == "__main__":
-    pass  
+    pass
