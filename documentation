@@ -1,0 +1,19 @@
+Purpose of program:
+  This project is the ticket price tracker project. Its purpose is to display ticket information for the user. The program does this by scraping ticket inforamtion for different events from Stubhub, a ticket          exchange website. That inforamtion is then presented to the user, making the process simpler by having all the ticket information in one place. 
+
+How to run program:
+  The program can be run from the command line in a few simple steps. After starting the program follow the steps below:
+  1. You will be asked 'What event are you looking for? (nfl, nba, nhl, golf, mlb):'. Simply respond with one of the provided event types and hit enter. 
+  2. The program will then navigate to stubhub and scrape ticket data. This may take a minute because the program is intentianlly going slow so it does not get blocked by the site. DO NOT EXIT OUT OF CHROME. Let         the program run until you are prompted again. 
+  3. The program will display a numbered list of events that match the criteria entered earlier. You will be asked to select an event by entering the number that corresponds that that event. Type the number and hit      enter.
+  4. Once you enter a number the event details along with available tickets will displayed. You may have to scroll up to see the event details if there is a large number of tickets available. 
+  5. You can then sort the tickets by price (low to high or high to low). Enter how you would like to sort the tickets and hit enter. 
+  6. A table of sorted tickets will be displayed. You will then choose a ticket by its number. Enter a number from the very first column (the column with no column header, just numbers). 
+  7. You will be asked to enter your email so that your ticket inforamtion can be sent to you. Enter your email and hit enter. 
+  8. If the email is successfully sent an alert will be displayed.
+  9. The message 'Thank you for using the ticket price tracker!' will be displayed and the program will close a few seconds later. 
+
+Important notes:
+  1. Pay close attention to what you are inputing into the program. If the proper inputs are not given you will be notified that your input was incorrect and you will be asked to try again. 
+  2. The program works by storing information in two different CSV files. These files can be found in your current directory under the name 'data' and 'Ticket_info'. These files have lots of information that you         may find useful. 
+  3. The program will be unable to run properly if the original CSV files are still saved in the current directory. This is because the program will try to create two CSV files that already exist. To run the             program again delete the original CSV files. 
