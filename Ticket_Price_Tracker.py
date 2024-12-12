@@ -17,8 +17,8 @@ def fetch_event_data():
         if event == 'nfl' or event == 'nba' or event == 'nhl' or event == 'golf' or event == 'mlb':
             break
         else:
-     
             print("Invalid event. Please enter a valid event.\n")
+            
    # Set up Chrome WebDriver
     driver = webdriver.Chrome()
 
@@ -181,29 +181,35 @@ def get_user_selection():
     
         except ValueError:
             print("Invalid input. Please enter a valid number.")
-            
-def display_event_details(event, available_tickets):
-    """Displays information for the specific event chosen
-    Parameters: event (dict): A dictionary containiing information of the event such as name, date, venue, website
-    Returns: None
-    """
-    # Prints event details for user to see
-    try:
-        print("\nEvent Details")
-        print(f"Name: {event.get('event name', 'N/A')}")
-        print(f"Date: {event.get('event location', 'N/A')}")
-        print(f"Venue: {event.get('event date', 'N/A')}")
-        print(f"Source: {event.get('ticket ', 'N/A')}")
-        print("\nAvailable Tickets:")
+class TicketDisplay:
+    
+    def __init__(self, event, available_tickets):
+        
+        self.event = event
+        self.available_tickets = available_tickets
+        
+    def display_event_details(self):
+        """Displays information for the specific event chosen
+        Parameters: event (dict): A dictionary containiing information of the event such as name, date, venue, website
+        Returns: None
+        """
+        # Prints event details for user to see
+        try:
+            print("\nEvent Details")
+            print(f"Name: {self.event.get('event name', 'N/A')}")
+            print(f"Date: {self.event.get('event location', 'N/A')}")
+            print(f"Venue: {self.event.get('event date', 'N/A')}")
+            print(f"Source: {self.event.get('ticket ', 'N/A')}")
+            print("\nAvailable Tickets:")
 
-        #  If there are tickets for the event ticket information gets printed out
-        if available_tickets:
-            for ticket in available_tickets:
-                print(f" - Section: {ticket.get('ticket_section', 'Unknown')}, Seat: {ticket.get('ticket_row', 'Unknown')}, Price: {ticket.get('ticket_price', 'Unknown')}")
-        else:
-            print("No ticket information available")
-    except:
-        pass
+            #  If there are tickets for the event ticket information gets printed out
+            if self.available_tickets:
+                for ticket in self.available_tickets:
+                    print(f" - Section: {ticket.get('ticket_section', 'Unknown')}, Seat: {ticket.get('ticket_row', 'Unknown')}, Price: {ticket.get('ticket_price', 'Unknown')}")
+            else:
+                print("No ticket information available")
+        except:
+            pass
     
 def generate_ticket_comparison_report(tickets):
     """
@@ -222,7 +228,7 @@ def generate_ticket_comparison_report(tickets):
     # Returns a sorted DataFrame depending on users choice
     while run_loop:
         try:
-            order = str(input("\nDisplay tickets priced low to high or high to low? (type 'low to high' or 'high to low) "))
+            order = str(input("\nDisplay tickets priced low to high or high to low? (type 'low to high' or 'high to low') "))
             if order == 'high to low':    
                 df = df.sort_values(by = 'ticket_price', ascending = False)
                 print(tabulate.tabulate(df, headers = 'keys', tablefmt = 'fancy_grid'))
@@ -302,7 +308,8 @@ if __name__ == "__main__":
     fetch_event_data()
     fetch_ticket_price()
     user_event, available_tickets, selection = get_user_selection()
-    display_event_details(user_event, available_tickets)
+    display = TicketDisplay(user_event, available_tickets)
+    display.display_event_details()
     user_ticket = generate_ticket_comparison_report(available_tickets)
     send_price_alert(available_tickets, user_ticket)
     print("\nThank you for using the ticket price tracker!")
