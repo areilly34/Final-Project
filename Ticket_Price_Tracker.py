@@ -220,22 +220,28 @@ def generate_ticket_comparison_report(tickets):
         table: table with ticket info 
     """
     
+    # Changes ticket_price values from str to int for proper sorting, also drops '$' sign
+    for ticket in tickets:
+            ticket["ticket_price"] = int(ticket['ticket_price'].replace('$', ''))
+    
     # Creates a DataFrame from tickets
     df = pd.DataFrame(tickets)
     
     run_loop = True
     
-    # Returns a sorted DataFrame depending on users choice
+    # Returns a sorted DataFrame depending on users choice, renames ticket_price column for more user clarity 
     while run_loop:
         try:
             order = str(input("\nDisplay tickets priced low to high or high to low? (type 'low to high' or 'high to low') "))
             if order == 'high to low':    
                 df = df.sort_values(by = 'ticket_price', ascending = False)
+                df.rename(columns={'ticket_price': 'ticket_price (in dollars $)'}, inplace=True)
                 print(tabulate.tabulate(df, headers = 'keys', tablefmt = 'fancy_grid'))
                 run_loop = False    
                     
             elif order == 'low to high':
                 df = df.sort_values(by = 'ticket_price', ascending = True)
+                df.rename(columns={'ticket_price': 'ticket_price (in dollars $)'}, inplace=True)
                 print(tabulate.tabulate(df, headers = 'keys', tablefmt = 'fancy_grid'))
                 run_loop = False
             
