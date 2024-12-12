@@ -178,7 +178,6 @@ def filter_events_by_activity(events, activities):
     print("Event counts by type:", type_count)
     return sorted_events
 
-
 def sort_tickets_by_price(tickets, order="asc"):
     """
     Sorts a list of tickets by price and includes handling for tie-breaking and additional metadata.
