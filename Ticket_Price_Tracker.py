@@ -143,66 +143,76 @@ def fetch_ticket_price():
 
             writer.writerow(dict(zip(ticket_data.keys(), row)))  # write each row as a dictionary
 
-
-# Define the filtering function
-def filter_events_by_activity(events, activity):
+def filter_events_by_activity(events, activities):
     """
-    Filters a list of events by the specified activity and sorts them by type.
+    Filters a list of events by the specified activities, 
+    sorts them by type, and includes additional metadata.
 
     Args:
         events (list): List of event dictionaries.
-        activity (str): Desired activity to filter by.
+        activities (list): List of desired activities to filter by.
 
     Returns:
-        list: A filtered and sorted list of events.
+        list: A filtered and sorted list of events with additional metadata.
     """
-    # Filter events by the specified activity
-    filtered_events = [event for event in events if event["activity"] == activity]
-    
-    # Sort filtered events by type
+    # Check for empty inputs
+    if not activities:
+        print("No activities specified for filtering. Returning all events.")
+        return sorted(events, key=lambda event: event["type"])
+
+    # Filter and collect statistics
+    filtered_events = [event for event in events if event["activity"] in activities]
+    if not filtered_events:
+        print("No events match the specified activities.")
+        return []
+
+    # Add metadata: count per type
+    type_count = {}
+    for event in filtered_events:
+        event_type = event["type"]
+        type_count[event_type] = type_count.get(event_type, 0) + 1
+
+    # Sort by type and return results with statistics
     sorted_events = sorted(filtered_events, key=lambda event: event["type"])
-    
+    print(f"Filtered {len(filtered_events)} events matching activities: {', '.join(activities)}")
+    print("Event counts by type:", type_count)
     return sorted_events
 
-# Define the sorting function
+
 def sort_tickets_by_price(tickets, order="asc"):
     """
-    Sorts a list of tickets by price in ascending or descending order.
+    Sorts a list of tickets by price and includes handling for tie-breaking and additional metadata.
 
     Args:
         tickets (list): List of ticket dictionaries.
         order (str): Sort order ('asc' for ascending, 'desc' for descending).
 
     Returns:
-        list: A list of tickets sorted by price.
+        list: A sorted list of tickets with additional information.
     """
-    # Determine if sorting is in ascending or descending order
+    # Determine sorting direction
     reverse = order == "desc"
+
+    # Add validation for ticket data
+    if not tickets:
+        print("No tickets to sort.")
+        return []
+
+    # Add tie-breaking: If prices are equal, sort by event name alphabetically
+    sorted_tickets = sorted(
+        tickets,
+        key=lambda ticket: (ticket["price"], ticket["name"]) if not reverse else (-ticket["price"], ticket["name"]),
+        reverse=reverse
+    )
+
+    # Add metadata: price range and average price
+    prices = [ticket["price"] for ticket in tickets]
+    min_price, max_price, avg_price = min(prices), max(prices), sum(prices) / len(prices)
     
-    # Sort the tickets by price
-    sorted_tickets = sorted(tickets, key=lambda ticket: ticket["price"], reverse=reverse)
-    
+    print(f"Sorted {len(tickets)} tickets in {'ascending' if not reverse else 'descending'} order.")
+    print(f"Price range: ${min_price} - ${max_price}, Average price: ${avg_price:.2f}")
+
     return sorted_tickets
-
-# Example usage of filter_events_by_activity
-desired_activity = "music"
-filtered_events = filter_events_by_activity(events, desired_activity)
-
-print("Filtered events by activity (music):")
-for event in filtered_events:
-    print(f"{event['name']} ({event['type']}) - ${event['price']}")
-
-# Example usage of sort_tickets_by_price
-sorted_tickets_asc = sort_tickets_by_price(events, order="asc")
-sorted_tickets_desc = sort_tickets_by_price(events, order="desc")
-
-print("\nTickets sorted by price in ascending order:")
-for ticket in sorted_tickets_asc:
-    print(f"{ticket['name']} ({ticket['type']}) - ${ticket['price']}")
-
-print("\nTickets sorted by price in descending order:")
-for ticket in sorted_tickets_desc:
-    print(f"{ticket['name']} ({ticket['type']}) - ${ticket['price']}")
 
 def get_user_selection():
     """
