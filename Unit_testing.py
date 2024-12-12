@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from Ticket_Price_Tracker import fetch_event_data, fetch_ticket_price
+from Ticket_Price_Tracker import fetch_event_data, fetch_ticket_price, send_price_alert
 import csv
 
 
@@ -97,6 +97,34 @@ class TestTicketPriceScraping(unittest.TestCase):
             'ticket_price': '$150'
         })
 
+class SendPriceAlert(unittest.TestCase):
+    available_tickets = [
+        {
+        "ticket_name": "NFL game",
+        "ticket_section": "100",
+        "ticket_row": "10",
+        "ticket_price": "$56"
+        } 
+    ]
+    user_ticket = 0
+
+    # Tests what happens if a valid email is never entered
+    @patch('builtins.input', return_value = 'nonsense_email')
+    def test_invalid_email(self, mock_input):
+        result = send_price_alert(SendPriceAlert.available_tickets, SendPriceAlert.user_ticket)
+        self.assertEqual(result, 'Too many invalid emails entered.')
+
+    # Tests if a few inputs are invalid, but then a valid email is entered
+    @patch('builtins.input', side_effect = ['not_an_email', 'also_not_an_email', 'finalproject326@gmail.com'])
+    def test_invaild_then_valid(self, mock_input):
+        result = send_price_alert(SendPriceAlert.available_tickets, SendPriceAlert.user_ticket)
+        self.assertEqual(result, 'Email sent.')
+        
+    # Tests if a valid email is entered from the start
+    @patch('builtins.input', return_value = 'finalproject326@gmail.com')
+    def test_valid(self, mock_input):
+        result = send_price_alert(SendPriceAlert.available_tickets, SendPriceAlert.user_ticket)
+        self.assertEqual(result, 'Email sent.')
 
 if __name__ == '__main__':
     unittest.main()

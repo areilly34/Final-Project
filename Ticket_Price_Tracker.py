@@ -347,22 +347,26 @@ def send_price_alert(available_tickets, user_ticket):
     """
     Sends email to user with ticket information
     Agrs:
-        ticket: Dictionary with ticket info
-        user_email: Email of the user
+        available_tickets: List of dictionaries with ticket info
+        user_ticket(int): Index of ticket user is interested in  
     Returns:
     
     """
     # Gets ticket from a list of tickets
     ticket = available_tickets[user_ticket]
     
+    i = 0
     # Checks that user_email is a valid email
-    while True:
+    while i <= 3:
         user_email = input("Please enter email to receive ticket information: ")
         email_style = (r"(^[a-zA-Z0-9_.±]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$)")
         if re.match(email_style, user_email):
             break
-        else:
+        elif i < 3:
             print("Invalid email. Please enter a valid email.\n")
+            i += 1
+        elif i == 3:
+            return("Too many invalid emails entered.")
     
     # Format body of email so the information is more readable for user
     subject = 'Ticket Information'
@@ -383,7 +387,7 @@ def send_price_alert(available_tickets, user_ticket):
         # Logs into account using credentials above
         smtpObj.login(user, password)
         smtpObj.sendmail(user, send_to, msg)
-        print("Email sent.")   
+        return("Email sent.")   
 
 
 if __name__ == "__main__":
@@ -393,5 +397,5 @@ if __name__ == "__main__":
     display = TicketDisplay(user_event, available_tickets)
     display.display_event_details()
     user_ticket = generate_ticket_comparison_report(available_tickets)
-    send_price_alert(available_tickets, user_ticket)
+    print(send_price_alert(available_tickets, user_ticket))
     print("\nThank you for using the ticket price tracker!")
