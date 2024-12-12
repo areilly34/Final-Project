@@ -143,15 +143,6 @@ def fetch_ticket_price():
 
             writer.writerow(dict(zip(ticket_data.keys(), row)))  # write each row as a dictionary
 
-# Sample list of events and tickets
-events = [
-    {"name": "Lil Baby Concert", "type": "concert", "activity": "music", "price": 120},
-    {"name": "NFL Baltimore Ravens vs. Kansas City Chiefs Football Game", "type": "sports", "activity": "outdoor", "price": 75},
-    {"name": "NBA Washington Wizards vs. Denver Nuggets Basketball Game", "type": "sports", "activity": "indoor", "price": 85},
-    {"name": "Jazz Festival", "type": "concert", "activity": "music", "price": 60},
-    {"name": "Katt Williams Comedy Show", "type": "entertainment", "activity": "indoor", "price": 90},
-    {"name": "DC United Soccer Game", "type": "sports", "activity": "outdoor", "price": 70}
-]
 
 # Define the filtering function
 def filter_events_by_activity(events, activity):
@@ -252,8 +243,14 @@ def get_user_selection():
         except ValueError:
             print("Invalid input. Please enter a valid number.")
 class TicketDisplay:
+    """This will display the ticket information the user selected """
     
     def __init__(self, event, available_tickets):
+        """ Initialization of the events and available tickets 
+            Args: 
+            event(str): it gets the event that is chosen by the user 
+            available_tickets(str): it gets the avaiable ticket based on the user selection
+            """
         
         self.event = event
         self.available_tickets = available_tickets
