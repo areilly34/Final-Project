@@ -300,7 +300,7 @@ def generate_ticket_comparison_report(tickets):
     
     # Changes ticket_price values from str to int for proper sorting, also drops '$' sign
     for ticket in tickets:
-            ticket["ticket_price"] = int(ticket['ticket_price'].replace('$', ''))
+            ticket["ticket_price"] = int(ticket['ticket_price'].replace('$', '').replace(',', ''))
     
     # Creates a DataFrame from tickets
     df = pd.DataFrame(tickets)
