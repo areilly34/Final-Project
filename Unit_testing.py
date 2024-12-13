@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from Ticket_Price_Tracker import fetch_event_data, fetch_ticket_price, send_price_alert
+from Ticket_Price_Tracker import fetch_event_data, fetch_ticket_price, send_price_alert, generate_ticket_comparison_report
 import csv
 
 
@@ -135,6 +135,28 @@ class SendPriceAlert(unittest.TestCase):
     def test_valid(self, mock_input):
         result = send_price_alert(SendPriceAlert.available_tickets, SendPriceAlert.user_ticket)
         self.assertEqual(result, 'Email sent.')
+        
+class TestGenerateTicketComparisonReport(unittest.TestCase):
+    @patch('builtins.input', side_effect = ['low to high', 1])
+    def test_valid_inputs_low_to_high(self, mock_input):
+        tickets = [
+            {"ticket_id": 1, "ticket_price": "$50", "event": "Concert A"},
+            {"ticket_id": 2, "ticket_price": "$30", "event": "Concert B"},
+            {"ticket_id": 3, "ticket_price": "$70", "event": "Concert C"},
+        ]
+        result = generate_ticket_comparison_report(tickets)
+        self.assertEqual(result, 1)
+       
+    # test intended to fail because of invalid input 
+    @patch('builtins.input', side_effect = ['low to high', 50])
+    def test_invalid_inputs_low_to_high(self, mock_input):
+        tickets = [
+            {"ticket_id": 1, "ticket_price": "$50", "event": "Concert A"},
+            {"ticket_id": 2, "ticket_price": "$30", "event": "Concert B"},
+            {"ticket_id": 3, "ticket_price": "$70", "event": "Concert C"},
+        ]
+        result = generate_ticket_comparison_report(tickets)
+        self.assertEqual(result, "Invalid number. Please enter a valid number.\n")
 
 if __name__ == '__main__':
     unittest.main()

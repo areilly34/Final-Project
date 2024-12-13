@@ -218,9 +218,11 @@ def get_user_selection():
     Allows users to choose an event from a list and returns the details of chosen event
 
     Parameters: 
-    events (list): A list of dictionaries, where each dictionary contains event details
 
-    Returns: The select event dictionary
+    Returns: 
+        user_event(dictionary): contains event details
+        available_tickets(list): List of dictionaries containg ticket info
+        selection(int): Number of event user wants to see tickets for
     """
     with open("data.csv", 'r') as event_data:
         reader = csv.DictReader(event_data)
@@ -257,8 +259,8 @@ class TicketDisplay:
     def __init__(self, event, available_tickets):
         """ Initialization of the events and available tickets 
             Args: 
-            event(str): it gets the event that is chosen by the user 
-            available_tickets(str): it gets the avaiable ticket based on the user selection
+            event(dict): Dictionary containing event details
+            available_tickets(list): List of dictionaries containg ticket information
             """
         
         self.event = event
@@ -266,7 +268,7 @@ class TicketDisplay:
         
     def display_event_details(self):
         """Displays information for the specific event chosen
-        Parameters: event (dict): A dictionary containiing information of the event such as name, date, venue, website
+        Parameters: self
         Returns: None
         """
         # Prints event details for user to see
