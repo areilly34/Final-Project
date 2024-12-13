@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from Ticket_Price_Tracker import fetch_event_data, fetch_ticket_price, send_price_alert, generate_ticket_comparison_report
+from Ticket_Price_Tracker import fetch_event_data, fetch_ticket_price, send_price_alert, generate_ticket_comparison_report, TicketDisplay, filter_events_by_activity, sort_tickets_by_price, get_user_selection
 import csv
 
 
