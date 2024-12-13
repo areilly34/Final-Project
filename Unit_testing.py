@@ -136,6 +136,20 @@ class TestDisplayEventDetails(unittest.TestCase):
         mock_print.assert_any_call(" - Section: 102, Seat: B, Price: $80")
 
 
+class TestGetUserSelection(unittest.TestCase):
+    @patch('builtins.input', side_effect=["1"])
+    @patch('builtins.open', new_callable=unittest.mock.mock_open, read_data="event_id,event_name,event_location,event_date,ticket\n1,Concert A,City Arena,2024-12-15,https://example.com/concert-a-tickets\n")
+    def test_get_user_selection(self, mock_open, mock_input):
+        # Mock ticket info
+        ticket_data = "ticket_id,ticket_name,ticket_section,ticket_row,ticket_price\n1,Concert A,101,A,$100\n2,Concert A,102,B,$80\n"
+        with patch('builtins.open', unittest.mock.mock_open(read_data=ticket_data), create=True):
+            user_event, available_tickets, selection = get_user_selection()
+        
+        # Validate output
+        self.assertEqual(user_event["event name"], "Concert A")
+        self.assertEqual(len(available_tickets), 2)
+        self.assertEqual(selection, 1)
+
 
 class SendPriceAlert(unittest.TestCase):
     available_tickets = [
