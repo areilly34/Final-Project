@@ -107,6 +107,36 @@ class TestTicketPriceScraping(unittest.TestCase):
             'ticket_price': '$150' # Mock ticket price 
         })
 
+class TestDisplayEventDetails(unittest.TestCase):
+    def test_display_event_details(self):
+        # Mock data for event and tickets
+        mock_event = {
+            "event name": "Concert A",
+            "event location": "City Arena",
+            "event date": "2024-12-15",
+            "ticket ": "https://example.com/concert-a-tickets"
+        }
+        mock_tickets = [
+            {"ticket_section": "101", "ticket_row": "A", "ticket_price": "$100"},
+            {"ticket_section": "102", "ticket_row": "B", "ticket_price": "$80"}
+        ]
+        
+        # Instantiate TicketDisplay and call the method
+        display = TicketDisplay(mock_event, mock_tickets)
+        with patch('builtins.print') as mock_print:
+            display.display_event_details()
+        
+        # Verify expected print statements
+        mock_print.assert_any_call("\nEvent Details")
+        mock_print.assert_any_call("Name: Concert A")
+        mock_print.assert_any_call("Date: City Arena")
+        mock_print.assert_any_call("Venue: 2024-12-15")
+        mock_print.assert_any_call("Source: https://example.com/concert-a-tickets")
+        mock_print.assert_any_call(" - Section: 101, Seat: A, Price: $100")
+        mock_print.assert_any_call(" - Section: 102, Seat: B, Price: $80")
+
+
+
 class SendPriceAlert(unittest.TestCase):
     available_tickets = [
         {
