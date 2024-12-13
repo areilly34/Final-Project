@@ -135,6 +135,108 @@ class TestDisplayEventDetails(unittest.TestCase):
         mock_print.assert_any_call(" - Section: 101, Seat: A, Price: $100")
         mock_print.assert_any_call(" - Section: 102, Seat: B, Price: $80")
 
+class TestEventFunctions(unittest.TestCase):
+    """
+    Unit tests for the functions filter_events_by_activity and sort_tickets_by_price.
+    """
+
+    def setUp(self):
+        """
+        Set up a common list of events and tickets to use across test cases.
+        """
+        self.events = [
+            {"name": "Jazz Festival", "type": "concert", "activity": "music", "price": 60},
+            {"name": "Lil Baby Concert", "type": "concert", "activity": "music", "price": 120},
+            {"name": "Football Game", "type": "sports", "activity": "outdoor", "price": 75},
+            {"name": "Basketball Game", "type": "sports", "activity": "indoor", "price": 85},
+        ]
+        self.tickets = self.events  # Same as events list, representing ticket prices.
+
+    # Tests for filter_events_by_activity
+    def test_filter_events_single_activity(self):
+        """
+        Test filtering events by a single activity.
+        """
+        result = filter_events_by_activity(self.events, ["music"])
+        expected = [
+            {"name": "Jazz Festival", "type": "concert", "activity": "music", "price": 60},
+            {"name": "Lil Baby Concert", "type": "concert", "activity": "music", "price": 120},
+        ]
+        self.assertEqual(result, expected)
+
+    def test_filter_events_multiple_activities(self):
+        """
+        Test filtering events by multiple activities.
+        """
+        result = filter_events_by_activity(self.events, ["music", "outdoor"])
+        expected = [
+            {"name": "Jazz Festival", "type": "concert", "activity": "music", "price": 60},
+            {"name": "Lil Baby Concert", "type": "concert", "activity": "music", "price": 120},
+            {"name": "Football Game", "type": "sports", "activity": "outdoor", "price": 75},
+        ]
+        self.assertEqual(result, expected)
+
+    def test_filter_events_no_matching_activities(self):
+        """
+        Test filtering when no events match the activity criteria.
+        """
+        result = filter_events_by_activity(self.events, ["gaming"])
+        self.assertEqual(result, [])
+
+    def test_filter_events_empty_activities(self):
+        """
+        Test filtering when activities list is empty.
+        """
+        result = filter_events_by_activity(self.events, [])
+        expected = sorted(self.events, key=lambda event: event["type"])
+        self.assertEqual(result, expected)
+
+    # Tests for sort_tickets_by_price
+    def test_sort_tickets_ascending(self):
+        """
+        Test sorting tickets in ascending order.
+        """
+        result = sort_tickets_by_price(self.tickets, order="asc")
+        expected = sorted(self.tickets, key=lambda ticket: (ticket["price"], ticket["name"]))
+        self.assertEqual(result, expected)
+
+    def test_sort_tickets_descending(self):
+        """
+        Test sorting tickets in descending order.
+        """
+        result = sort_tickets_by_price(self.tickets, order="desc")
+        expected = sorted(
+            self.tickets, 
+            key=lambda ticket: (-ticket["price"], ticket["name"])
+        )
+        self.assertEqual(result, expected)
+
+    def test_sort_tickets_tie_breaker(self):
+        """
+        Test sorting tickets with tie-breaking on event names.
+        """
+        tied_tickets = [
+            {"name": "Concert A", "type": "concert", "activity": "music", "price": 100},
+            {"name": "Concert B", "type": "concert", "activity": "music", "price": 100},
+        ]
+        result = sort_tickets_by_price(tied_tickets, order="asc")
+        expected = sorted(tied_tickets, key=lambda ticket: (ticket["price"], ticket["name"]))
+        self.assertEqual(result, expected)
+
+    def test_sort_tickets_empty_list(self):
+        """
+        Test sorting when the tickets list is empty.
+        """
+        result = sort_tickets_by_price([], order="asc")
+        self.assertEqual(result, [])
+
+    def test_sort_tickets_invalid_order(self):
+        """
+        Test sorting with an invalid order string. Defaults to ascending.
+        """
+        result = sort_tickets_by_price(self.tickets, order="invalid")
+        expected = sorted(self.tickets, key=lambda ticket: (ticket["price"], ticket["name"]))
+        self.assertEqual(result, expected)
 
 class TestGetUserSelection(unittest.TestCase):
     @patch('builtins.input', side_effect=["1"])
